@@ -558,3 +558,168 @@ Source: Conversation with Copilot, 9/5/2024
 (2) SQL Subquery: An Ultimate Guide with Practical Examples. https://www.sqltutorial.org/sql-subquery/.
 (3) SQL Subquery (With Examples) - Programiz. https://www.programiz.com/sql/subquery.
 (4) SQL Subquery Practice: 15 Exercises with Solutions. https://learnsql.com/blog/sql-subquery-practice/.
+
+A **primary key** is a unique identifier for each record in a database table. It ensures that each record can be uniquely identified and distinguished from all other records in the table. Here are some key points about primary keys:
+
+1. **Uniqueness**: Each value in the primary key column(s) must be unique across the table.
+2. **Non-null**: Primary key columns cannot contain NULL values.
+3. **Single or Composite**: A primary key can consist of a single column or multiple columns (composite key).
+4. **Immutable**: The values in the primary key should not change over time.
+
+Here's an example of how to define a primary key in SQL:
+
+```sql
+CREATE TABLE Employees (
+    EmployeeID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    PRIMARY KEY (EmployeeID)
+);
+```
+
+In this example, `EmployeeID` is the primary key for the `Employees` table, ensuring each employee has a unique identifier.
+
+Do you have any specific questions about primary keys or how to use them in your database?
+
+Source: Conversation with Copilot, 9/5/2024
+(1) SQL PRIMARY KEY Constraint - W3Schools. https://www.w3schools.com/sql/sql_primarykey.ASP.
+(2) Primary Key in DBMS - GeeksforGeeks. https://www.geeksforgeeks.org/primary-key-in-dbms/.
+(3) Primary key - Wikipedia. https://en.wikipedia.org/wiki/Primary_key.
+(4) What is a Primary Key? - Definition from Techopedia. https://www.techopedia.com/definition/5547/primary-key.
+
+A table can have **only one primary key**. However, this primary key can consist of a single column or multiple columns (composite key). The primary key uniquely identifies each record in the table, ensuring data integrity and efficient querying.
+
+For example, in a table with a composite primary key:
+
+```sql
+CREATE TABLE Orders (
+    OrderID int NOT NULL,
+    ProductID int NOT NULL,
+    Quantity int,
+    PRIMARY KEY (OrderID, ProductID)
+);
+```
+
+Here, the combination of `OrderID` and `ProductID` forms the primary key, ensuring that each order-product pair is unique.
+
+Do you have any other questions about primary keys or database design?
+
+The **DELETE** and **TRUNCATE** commands in SQL are both used to remove data from tables, but they have some key differences:
+
+### DELETE
+1. **Type**: DELETE is a Data Manipulation Language (DML) command.
+2. **Usage**: It removes specified rows from a table based on a condition in the WHERE clause. If no condition is specified, it removes all rows.
+3. **Logging**: Each row deletion is logged individually, which can make it slower for large datasets.
+4. **Triggers**: DELETE operations can activate triggers.
+5. **Rollback**: DELETE operations can be rolled back if they are part of a transaction.
+6. **Syntax**:
+    ```sql
+    DELETE FROM table_name WHERE condition;
+    ```
+
+### TRUNCATE
+1. **Type**: TRUNCATE is a Data Definition Language (DDL) command.
+2. **Usage**: It removes all rows from a table without using a WHERE clause.
+3. **Logging**: It logs the deallocation of data pages, making it faster than DELETE for large datasets.
+4. **Triggers**: TRUNCATE does not activate triggers.
+5. **Rollback**: TRUNCATE operations cannot be rolled back once committed.
+6. **Syntax**:
+    ```sql
+    TRUNCATE TABLE table_name;
+    ```
+
+### Key Differences
+- **Scope**: DELETE can remove specific rows based on a condition, while TRUNCATE removes all rows.
+- **Speed**: TRUNCATE is generally faster because it deallocates data pages instead of logging individual row deletions.
+- **Triggers**: DELETE can activate triggers, but TRUNCATE does not.
+- **Rollback**: DELETE can be rolled back if within a transaction, whereas TRUNCATE cannot be rolled back once committed.
+
+Here's a quick comparison:
+
+| Feature       | DELETE                              | TRUNCATE                          |
+|---------------|-------------------------------------|-----------------------------------|
+| Type          | DML                                 | DDL                               |
+| Condition     | Can use WHERE clause                | Cannot use WHERE clause           |
+| Logging       | Logs individual row deletions       | Logs page deallocations           |
+| Speed         | Slower for large datasets           | Faster for large datasets         |
+| Triggers      | Can activate triggers               | Does not activate triggers        |
+| Rollback      | Can be rolled back                  | Cannot be rolled back once committed |
+
+Do you have any specific scenarios in mind where you're deciding between DELETE and TRUNCATE?
+
+Source: Conversation with Copilot, 9/5/2024
+(1) Difference between DELETE and TRUNCATE - GeeksforGeeks. https://www.geeksforgeeks.org/difference-between-delete-and-truncate/.
+(2) Understanding the Difference Between TRUNCATE, DELETE, and DROP in SQL .... https://www.baeldung.com/sql/truncate-vs-delete.
+(3) Difference between Delete and truncate in sql query. https://www.tutorialspoint.com/difference-between-delete-and-truncate-in-sql-query.
+(4) Differences between Delete and Truncate in SQL Server. https://www.mssqltips.com/sqlservertip/4248/differences-between-delete-and-truncate-in-sql-server/.
+
+Sure! Let's go through an example to illustrate the **ACID** properties in SQL transactions.
+
+### Scenario: Transferring Money Between Bank Accounts
+
+Imagine you are transferring money from Account A to Account B. This involves two main operations:
+1. Deducting the amount from Account A.
+2. Adding the amount to Account B.
+
+### Atomicity
+**Atomicity** ensures that both operations are completed successfully. If either operation fails, the entire transaction is rolled back, and no changes are made.
+
+```sql
+BEGIN TRANSACTION;
+
+UPDATE Accounts SET Balance = Balance - 100 WHERE AccountID = 'A';
+UPDATE Accounts SET Balance = Balance + 100 WHERE AccountID = 'B';
+
+COMMIT;
+```
+
+If the second `UPDATE` fails, the transaction will roll back, and Account A's balance will not be deducted.
+
+### Consistency
+**Consistency** ensures that the database remains in a valid state before and after the transaction. For example, the total amount of money in both accounts should remain the same.
+
+Before the transaction:
+- Account A: $500
+- Account B: $300
+
+After the transaction:
+- Account A: $400
+- Account B: $400
+
+### Isolation
+**Isolation** ensures that transactions are executed independently. If another transaction is trying to access the same accounts, it will wait until the current transaction is complete.
+
+```sql
+BEGIN TRANSACTION;
+
+-- Transaction 1
+UPDATE Accounts SET Balance = Balance - 100 WHERE AccountID = 'A';
+
+-- Transaction 2 (will wait until Transaction 1 is complete)
+UPDATE Accounts SET Balance = Balance + 50 WHERE AccountID = 'A';
+
+COMMIT;
+```
+
+### Durability
+**Durability** ensures that once a transaction is committed, it remains so, even in the event of a system failure. The changes made by the transaction are permanently stored in the database.
+
+```sql
+BEGIN TRANSACTION;
+
+UPDATE Accounts SET Balance = Balance - 100 WHERE AccountID = 'A';
+UPDATE Accounts SET Balance = Balance + 100 WHERE AccountID = 'B';
+
+COMMIT;
+```
+
+Even if the system crashes after the `COMMIT`, the changes will be retained.
+
+### Summary
+- **Atomicity**: All or nothing.
+- **Consistency**: Valid state transitions.
+- **Isolation**: Independent transactions.
+- **Durability**: Permanent changes.
+
+I hope this example clarifies the ACID properties! Do you have any other questions or need further clarification?
